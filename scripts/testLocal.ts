@@ -1,11 +1,11 @@
 import { ethers } from "hardhat";
 
-const acc = "0xeC4cFde48EAdca2bC63E94BB437BbeAcE1371bF3";
+const acc = "0xd3e5b33d4e94ef7764b8a9341c1004df7ebbcd01";
 const MTK_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
 
-const FACTORY_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-const EP_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-const PM_ADDRESS = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
+const FACTORY_ADDRESS = "0x0b3b4d0F8348A65D5Ba0bc365f640B8Ff9baf31F";
+const EP_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
+const PM_ADDRESS = "0xD0ea240F7e207c4A9866952ce3bAE9E35Df01e2b";
 
 async function main() {
 	const entryPoint = await ethers.getContractAt("EntryPoint", EP_ADDRESS);
@@ -31,12 +31,12 @@ async function main() {
 	);
 	console.log(`account balance: ${await provider.getBalance(acc)}`);
 
-	console.log(`account erc20 balance: ${await mtkContract.balanceOf(acc)}`);
-	console.log(
-		`signer1 erc20 balance: ${await mtkContract.balanceOf(
-			await signer1.getAddress()
-		)}`
-	);
+	// console.log(`account erc20 balance: ${await mtkContract.balanceOf(acc)}`);
+	// console.log(
+	// 	`signer1 erc20 balance: ${await mtkContract.balanceOf(
+	// 		await signer1.getAddress()
+	// 	)}`
+	// );
 	// console.log(
 	// 	`signer1 balance: ${await provider.getBalance(await signer1.getAddress())}`
 	// );

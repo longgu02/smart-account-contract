@@ -8,6 +8,7 @@ import "@account-abstraction/contracts/core/EntryPoint.sol";
 import "@account-abstraction/contracts/interfaces/IAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/Create2.sol";
 
 contract Test {
     constructor(bytes memory sig) {
@@ -43,25 +44,6 @@ contract Account is IAccount {
         return owner == recovered ? 0 : 1;
     }
 
-    function _call(address target, uint256 value, bytes memory data) internal {
-        assembly {
-            let success := call(
-                gas(),
-                target,
-                value,
-                add(data, 0x20),
-                mload(data),
-                0,
-                0
-            )
-            let ptr := mload(0x40)
-            returndatacopy(ptr, 0, returndatasize())
-            if iszero(success) {
-                revert(ptr, returndatasize())
-            }
-        }
-    }
-
     function sendERC20(
         address payable _to,
         address addERC20,
@@ -89,7 +71,31 @@ contract Account is IAccount {
 
 contract AccountFactory {
     function createAccount(address owner) external returns (address) {
-        Account acc = new Account(owner);
-        return address(acc);
+        bytes32 salt = bytes32(uint256(uint160(owner)));
+        bytes memory creationCode = type(Account).creationCode;
+        bytes memory bytecode = abi.encodePacked(
+            creationCode,
+            abi.encode(owner)
+        );
+
+        address addr = Create2.computeAddress(salt, keccak256(bytecode));
+        uint256 codeSize = addr.code.length;
+        if (codeSize > 0) {
+            return addr;
+        }
+
+        return deploy(salt, bytecode);
+    }
+
+    function deploy(
+        bytes32 salt,
+        bytes memory bytecode
+    ) internal returns (address addr) {
+        require(bytecode.length != 0, "Create2: bytecode length is zero");
+        /// @solidity memory-safe-assembly
+        assembly {
+            addr := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
+        }
+        require(addr != address(0), "Create2: Failed on deploy");
     }
 }

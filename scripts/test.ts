@@ -1,16 +1,19 @@
 import { ethers } from "hardhat";
 
-const acc = "0x23fC5F7f5Ef227e7fb7BB58feca70472978B3Cfe";
-const FACTORY_ADDRESS = "0xAc0842fb2B3BC05B483d62bf48D30BD122c54C04";
-const EP_ADDRESS = "0xb2B9979424E784b956B508303042560B6eed4fc1";
-const PM_ADDRESS = "0x07f05bf62Cc6c427679AedEA3753Ad4644E77a6b";
-const INFURA_API_KEY = process.env.INFURA_API_KEY;
+const acc = "0xd3e5b33d4e94ef7764b8a9341c1004df7ebbcd01";
+
+const FACTORY_ADDRESS = "0x0b3b4d0F8348A65D5Ba0bc365f640B8Ff9baf31F";
+const EP_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
+const PM_ADDRESS = "0xD0ea240F7e207c4A9866952ce3bAE9E35Df01e2b";
+
+const ALCHEMY_SEPOLIA =
+	process.env.ALCHEMY_SEPOLIA || "qGkwl3M3bVBT-jyOqJjLnmgYEz-hmW3R";
 
 async function main() {
 	const entryPoint = await ethers.getContractAt("EntryPoint", EP_ADDRESS);
 
 	const provider = new ethers.JsonRpcProvider(
-		`https://sepolia.infura.io/v3/${INFURA_API_KEY}`
+		`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_SEPOLIA}`
 	);
 	const [signer0] = await ethers.getSigners();
 	const account = await ethers.getContractAt("Account", acc);
