@@ -44,29 +44,70 @@ contract Account is IAccount {
         return owner == recovered ? 0 : 1;
     }
 
-    function sendERC20(
-        address payable _to,
-        address addERC20,
-        uint256 _amount
+    // function sendERC20(
+    //     address payable _to,
+    //     address addERC20,
+    //     uint256 _amount
+    // ) public {
+    //     // Create an instance of the ERC20 token contract
+    //     IERC20 token = IERC20(addERC20);
+
+    //     // Transfer the tokens
+    //     require(token.transfer(_to, _amount), "Transfer failed");
+    // }
+
+    // function sendEther(address payable _to, uint256 _amount) public {
+    //     require(
+    //         address(this).balance >= _amount,
+    //         "Insufficient balance in contract"
+    //     );
+    //     _to.transfer(_amount);
+    // }
+
+    // function execute() external {
+    //     count += 10;
+    // }
+
+    function _call(address target, uint256 value, bytes memory data) internal {
+        assembly {
+            let success := call(
+                gas(),
+                target,
+                value,
+                add(data, 0x20),
+                mload(data),
+                0,
+                0
+            )
+            let ptr := mload(0x40)
+            returndatacopy(ptr, 0, returndatasize())
+            if iszero(success) {
+                revert(ptr, returndatasize())
+            }
+        }
+    }
+
+    function execute_ncC(
+        address dest,
+        uint256 value,
+        bytes calldata func
     ) public {
-        // Create an instance of the ERC20 token contract
-        IERC20 token = IERC20(addERC20);
-
-        // Transfer the tokens
-        require(token.transfer(_to, _amount), "Transfer failed");
+        // _requireFromEntryPoint();
+        _call(dest, value, func);
     }
 
-    function sendEther(address payable _to, uint256 _amount) public {
-        require(
-            address(this).balance >= _amount,
-            "Insufficient balance in contract"
-        );
-        _to.transfer(_amount);
+    function execute(
+        address dest,
+        uint256 value,
+        bytes calldata func
+    ) external {
+        execute_ncC(dest, value, func);
     }
 
-    function execute() external {
-        count += 10;
-    }
+    //     function _requireFromEntryPoint() internal view {
+    //     if (msg.sender != address(entryPoint()))
+    //         revert CallerIsNotEntryPoint(msg.sender);
+    // }
 }
 
 contract AccountFactory {

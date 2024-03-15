@@ -7,11 +7,11 @@ async function main() {
 
 	console.log(`AF deployed to ${af.target}`);
 
-	// const ep = await ethers.deployContract("EntryPoint");
+	const ep = await ethers.deployContract("EntryPoint");
 
-	// await ep.waitForDeployment();
+	await ep.waitForDeployment();
 
-	// console.log(`EP deployed to ${ep.target}`);
+	console.log(`EP deployed to ${ep.target}`);
 
 	const pm = await ethers.deployContract("Paymaster");
 

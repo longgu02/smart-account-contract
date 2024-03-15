@@ -1,15 +1,14 @@
 import { ethers } from "hardhat";
 
-const acc = "0xd3e5b33d4e94ef7764b8a9341c1004df7ebbcd01";
 const MTK_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
 
-const FACTORY_ADDRESS = "0x0b3b4d0F8348A65D5Ba0bc365f640B8Ff9baf31F";
-const EP_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
-const PM_ADDRESS = "0xD0ea240F7e207c4A9866952ce3bAE9E35Df01e2b";
-
+const acc = "0x245409bc50ce8a8275c429a804b871f469734d9e";
+const FACTORY_ADDRESS = "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c";
+const EP_ADDRESS = "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d";
+const PM_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
 async function main() {
 	const entryPoint = await ethers.getContractAt("EntryPoint", EP_ADDRESS);
-	const mtkContract = await ethers.getContractAt("MyToken", MTK_ADDRESS);
+	// const mtkContract = await ethers.getContractAt("MyToken", MTK_ADDRESS);
 
 	const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 	const [signer0, signer1] = await ethers.getSigners();
