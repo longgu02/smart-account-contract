@@ -23,6 +23,7 @@ contract Test {
 contract Account is IAccount {
     uint public count;
     address public owner;
+    mapping(address => bool) public signable;
 
     constructor(address _owner) {
         owner = _owner;
@@ -42,6 +43,11 @@ contract Account is IAccount {
             userOp.signature
         );
         return owner == recovered ? 0 : 1;
+    }
+
+    function addSigner(address signer) external {
+        require(msg.sender == owner, "Forbidden: Caller must be an owner");
+        signable[signer] = true;
     }
 
     // function sendERC20(
