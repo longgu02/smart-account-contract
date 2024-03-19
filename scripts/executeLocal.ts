@@ -2,9 +2,9 @@ import { ethers } from "hardhat";
 
 const FACTORY_NONCE = 1;
 const acc = "0x245409bc50ce8a8275c429a804b871f469734d9e";
-const FACTORY_ADDRESS = "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c";
-const EP_ADDRESS = "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d";
-const PM_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
+const FACTORY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const EP_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const PM_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
 async function main() {
 	const [signer0, signer1] = await ethers.getSigners();
@@ -21,7 +21,9 @@ async function main() {
 	let initCode =
 		FACTORY_ADDRESS +
 		AccountFactory.interface
-			.encodeFunctionData("createAccount", [address0])
+			.encodeFunctionData("createAccount", [
+				"0x1df742d8e2518946924567b5c96eea22ae528e71",
+			])
 			.slice(2);
 
 	let sender: any;
@@ -71,9 +73,9 @@ async function main() {
 	// 	});
 
 	const Account = await ethers.getContractFactory("Account");
-	// await entryPoint.depositTo(PM_ADDRESS, {
-	// 	value: ethers.parseEther("10"),
-	// });
+	await entryPoint.depositTo(PM_ADDRESS, {
+		value: ethers.parseEther("10"),
+	});
 	// await entryPoint.depositTo("0xa16E02E87b7454126E5E10d957A927A7F5B5d2be", {
 	// 	value: ethers.parseEther("1000"),
 	// });

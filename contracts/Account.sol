@@ -9,6 +9,7 @@ import "@account-abstraction/contracts/interfaces/IAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
+import {SmartAccount} from "./SmartAccount.sol";
 
 contract Test {
     constructor(bytes memory sig) {
@@ -117,12 +118,12 @@ contract Account is IAccount {
 }
 
 contract AccountFactory {
-    function createAccount(address owner) external returns (address) {
-        bytes32 salt = bytes32(uint256(uint160(owner)));
-        bytes memory creationCode = type(Account).creationCode;
+    function createAccount(address entryPoint) external returns (address) {
+        bytes32 salt = bytes32(uint256(uint160(entryPoint)));
+        bytes memory creationCode = type(SmartAccount).creationCode;
         bytes memory bytecode = abi.encodePacked(
             creationCode,
-            abi.encode(owner)
+            abi.encode(entryPoint)
         );
 
         address addr = Create2.computeAddress(salt, keccak256(bytecode));
