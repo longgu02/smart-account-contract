@@ -1,0 +1,26 @@
+export enum Network {
+	local = "local",
+	sepolia = "sepolia",
+}
+
+interface Address {
+	ACCOUNT: string;
+	FACTORY_ADDRESS: string;
+	EP_ADDRESS: string;
+	PM_ADDRESS: string;
+}
+
+export const ADDRESSES: { [key in Network]: Address } = {
+	sepolia: {
+		ACCOUNT: "0xeC4cFde48EAdca2bC63E94BB437BbeAcE1371bF3",
+		FACTORY_ADDRESS: "0x0b3b4d0F8348A65D5Ba0bc365f640B8Ff9baf31F",
+		EP_ADDRESS: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+		PM_ADDRESS: "0xD0ea240F7e207c4A9866952ce3bAE9E35Df01e2b",
+	},
+	local: {
+		ACCOUNT: "0x245409bc50ce8a8275c429a804b871f469734d9e",
+		FACTORY_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+		EP_ADDRESS: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+		PM_ADDRESS: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+	},
+};
