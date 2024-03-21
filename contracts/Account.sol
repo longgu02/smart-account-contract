@@ -9,6 +9,9 @@ import "@account-abstraction/contracts/interfaces/IAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
+import {IAuthorizationModule} from "./interfaces/IAuthorizationModule.sol";
+import {ModuleManager} from "./base/ModuleManager.sol";
+import {SmartAccountErrors} from "./common/Errors.sol";
 
 // import {SmartAccount} from "./SmartAccount.sol";
 
@@ -22,7 +25,7 @@ contract Test {
     }
 }
 
-contract Account is IAccount {
+contract Account is IAccount, ModuleManager, SmartAccountErrors {
     uint public count;
     address public owner;
     mapping(address => bool) public signable;
@@ -35,22 +38,53 @@ contract Account is IAccount {
 
     receive() external payable {}
 
+    // /**
+    //  * @dev Adds a module to the allowlist.
+    //  * @notice This SHOULD only be done via userOp or a selfcall.
+    //  */
+    // function enableModule(address module) external virtual override {}
+
+    // /**
+    //  * @dev Setups module for this Smart Account and enables it.
+    //  * @notice This SHOULD only be done via userOp or a selfcall.
+    //  */
+    // function setupAndEnableModule(
+    //     address setupContract,
+    //     bytes memory setupData
+    // ) external virtual override returns (address) {}
+
     function validateUserOp(
         UserOperation calldata userOp,
         bytes32 userOpHash,
         uint256
     ) external view returns (uint256 validationData) {
+        // if (msg.sender != address(entryPoint()))
+        //     revert CallerIsNotAnEntryPoint(msg.sender);
+
+        (, address validationModule) = abi.decode(
+            userOp.signature,
+            (bytes, address)
+        );
+        if (address(_modules[validationModule]) != address(0)) {
+            validationData = IAuthorizationModule(validationModule)
+                .validateUserOp(userOp, userOpHash);
+        } else {
+            revert WrongValidationModule(validationModule);
+        }
+        // // Check nonce requirement if any
+        // _payPrefund(missingAccountFunds);
         address recovered = ECDSA.recover(
             ECDSA.toEthSignedMessageHash(userOpHash),
             userOp.signature
         );
+
         return owner == recovered ? 0 : 1;
     }
 
-    function addSigner(address signer) external {
-        require(msg.sender == owner, "Forbidden: Caller must be an owner");
-        signable[signer] = true;
-    }
+    // function addSigner(address signer) external {
+    //     require(msg.sender == owner, "Forbidden: Caller must be an owner");
+    //     signable[signer] = true;
+    // }
 
     // function sendERC20(
     //     address payable _to,
@@ -116,6 +150,12 @@ contract Account is IAccount {
     //     if (msg.sender != address(entryPoint()))
     //         revert CallerIsNotEntryPoint(msg.sender);
     // }
+    function enableModule(address module) external virtual override {}
+
+    function setupAndEnableModule(
+        address setupContract,
+        bytes memory setupData
+    ) external virtual override returns (address) {}
 }
 
 contract AccountFactory {
