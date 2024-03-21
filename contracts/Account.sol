@@ -30,6 +30,9 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     address public owner;
     mapping(address => bool) public signable;
 
+    IEntryPoint private immutable ENTRY_POINT;
+    address private immutable SELF;
+
     constructor(address _owner) {
         owner = _owner;
     }
@@ -38,39 +41,48 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
 
     receive() external payable {}
 
-    // /**
-    //  * @dev Adds a module to the allowlist.
-    //  * @notice This SHOULD only be done via userOp or a selfcall.
-    //  */
-    // function enableModule(address module) external virtual override {}
+    /**
+     * @dev Adds a module to the allowlist.
+     * @notice This can only be done via a userOp or a selfcall.
+     * @notice Enables the module `module` for the wallet.
+     * @param module Module to be allow-listed.
+     */
+    function enableModule(address module) external virtual override {
+        // _requireFromEntryPointOrSelf();
+        _enableModule(module);
+    }
 
-    // /**
-    //  * @dev Setups module for this Smart Account and enables it.
-    //  * @notice This SHOULD only be done via userOp or a selfcall.
-    //  */
-    // function setupAndEnableModule(
-    //     address setupContract,
-    //     bytes memory setupData
-    // ) external virtual override returns (address) {}
+    /**
+     * @dev Setups module for this Smart Account and enables it.
+     * @notice This can only be done via userOp or a selfcall.
+     * @notice Enables the module `module` for the wallet.
+     */
+    function setupAndEnableModule(
+        address setupContract,
+        bytes memory setupData
+    ) external virtual override returns (address) {
+        // _requireFromEntryPointOrSelf();
+        return _setupAndEnableModule(setupContract, setupData);
+    }
 
     function validateUserOp(
         UserOperation calldata userOp,
         bytes32 userOpHash,
         uint256
-    ) external view returns (uint256 validationData) {
+    ) external returns (uint256 validationData) {
         // if (msg.sender != address(entryPoint()))
         //     revert CallerIsNotAnEntryPoint(msg.sender);
 
-        (, address validationModule) = abi.decode(
-            userOp.signature,
-            (bytes, address)
-        );
-        if (address(_modules[validationModule]) != address(0)) {
-            validationData = IAuthorizationModule(validationModule)
-                .validateUserOp(userOp, userOpHash);
-        } else {
-            revert WrongValidationModule(validationModule);
-        }
+        // (, address validationModule) = abi.decode(
+        //     userOp.signature,
+        //     (bytes, address)
+        // );
+        // if (address(_modules[validationModule]) != address(0)) {
+        //     validationData = IAuthorizationModule(validationModule)
+        //         .validateUserOp(userOp, userOpHash);
+        // } else {
+        //     revert WrongValidationModule(validationModule);
+        // }
         // // Check nonce requirement if any
         // _payPrefund(missingAccountFunds);
         address recovered = ECDSA.recover(
@@ -150,12 +162,6 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     //     if (msg.sender != address(entryPoint()))
     //         revert CallerIsNotEntryPoint(msg.sender);
     // }
-    function enableModule(address module) external virtual override {}
-
-    function setupAndEnableModule(
-        address setupContract,
-        bytes memory setupData
-    ) external virtual override returns (address) {}
 }
 
 contract AccountFactory {
