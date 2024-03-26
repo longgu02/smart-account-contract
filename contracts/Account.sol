@@ -33,8 +33,10 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     IEntryPoint private immutable ENTRY_POINT;
     address private immutable SELF;
 
-    constructor(address _owner) {
+    constructor(address _owner, address _entryPointAddress) {
         owner = _owner;
+        ENTRY_POINT = IEntryPoint(_entryPointAddress);
+        SELF = address(this);
     }
 
     fallback() external payable {}
@@ -72,25 +74,31 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     ) external returns (uint256 validationData) {
         // if (msg.sender != address(entryPoint()))
         //     revert CallerIsNotAnEntryPoint(msg.sender);
+        if (userOp.signature.length < 200) {
+            address recovered = ECDSA.recover(
+                ECDSA.toEthSignedMessageHash(userOpHash),
+                userOp.signature
+            );
+            return owner == recovered ? 0 : 1;
+        }
 
-        // (, address validationModule) = abi.decode(
-        //     userOp.signature,
-        //     (bytes, address)
-        // );
+        (, address validationModule) = abi.decode(
+            userOp.signature,
+            (bytes, address)
+        );
+        console.log(validationModule);
         // if (address(_modules[validationModule]) != address(0)) {
-        //     validationData = IAuthorizationModule(validationModule)
-        //         .validateUserOp(userOp, userOpHash);
+        validationData = IAuthorizationModule(validationModule).validateUserOp(
+            userOp,
+            userOpHash
+        );
         // } else {
-        //     revert WrongValidationModule(validationModule);
+        // revert WrongValidationModule(validationModule);
+        // return 1;
         // }
+
         // // Check nonce requirement if any
         // _payPrefund(missingAccountFunds);
-        address recovered = ECDSA.recover(
-            ECDSA.toEthSignedMessageHash(userOpHash),
-            userOp.signature
-        );
-
-        return owner == recovered ? 0 : 1;
     }
 
     // function addSigner(address signer) external {
@@ -165,11 +173,15 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
 }
 
 contract AccountFactory {
-    function createAccount(address entryPoint) external returns (address) {
-        bytes32 salt = bytes32(uint256(uint160(entryPoint)));
+    function createAccount(
+        address owner,
+        address entryPoint
+    ) external returns (address) {
+        bytes32 salt = bytes32(uint256(uint160(owner)));
         bytes memory creationCode = type(Account).creationCode;
         bytes memory bytecode = abi.encodePacked(
             creationCode,
+            abi.encode(owner),
             abi.encode(entryPoint)
         );
 

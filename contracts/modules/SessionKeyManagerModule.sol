@@ -20,7 +20,6 @@ struct SessionStorage {
  *           Session Validation modules can perform
  *         - Should be used with carefully verified and audited Session Validation Modules only
  *         - Compatible with Biconomy Modular Interface v 0.1
- * @author Fil Makarov - <filipp.makarov@biconomy.io>
  */
 
 contract SessionKeyManager is BaseAuthorizationModule, ISessionKeyManager {
@@ -77,7 +76,7 @@ contract SessionKeyManager is BaseAuthorizationModule, ISessionKeyManager {
 
         return
             _packValidationData(
-                //_packValidationData expects true if sig validation has failed, false otherwise
+                // _packValidationData expects true if sig validation has failed, false otherwise
                 !ISessionValidationModule(sessionValidationModule)
                     .validateSessionUserOp(
                         userOp,
@@ -85,6 +84,7 @@ contract SessionKeyManager is BaseAuthorizationModule, ISessionKeyManager {
                         sessionKeyData,
                         sessionKeySignature
                     ),
+                // true,
                 validUntil,
                 validAfter
             );
@@ -131,6 +131,7 @@ contract SessionKeyManager is BaseAuthorizationModule, ISessionKeyManager {
                 sessionKeyData
             )
         );
+
         if (
             !MerkleProof.verify(merkleProof, sessionKeyStorage.merkleRoot, leaf)
         ) {

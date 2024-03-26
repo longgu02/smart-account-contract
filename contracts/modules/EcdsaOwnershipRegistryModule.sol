@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ^0.8.24;
 
 import {BaseAuthorizationModule} from "./BaseAuthorizationModule.sol";
 import {UserOperation} from "@account-abstraction/contracts/interfaces/UserOperation.sol";
@@ -15,7 +15,6 @@ import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
  *         (see https://support.metamask.io/hc/en-us/articles/14764161421467-What-is-eth-sign-and-why-is-it-a-risk-)
  * !!!!!!! Only EOA owners supported, no Smart Account Owners
  *         For Smart Contract Owners check SmartContractOwnership module instead
- * @author Fil Makarov - <filipp.makarov@biconomy.io>
  */
 
 contract EcdsaOwnershipRegistryModule is BaseAuthorizationModule {

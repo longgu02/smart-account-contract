@@ -52,3 +52,16 @@ export const fillUserOp = async (
 
 	return userOp;
 };
+
+// export function getUserOpHash(
+//   op: UserOperation,
+//   entryPoint: string,
+//   chainId: number
+// ): string {
+//   const userOpHash = keccak256(packUserOp(op, true));
+//   const enc = defaultAbiCoder.encode(
+//     ["bytes32", "address", "uint256"],
+//     [userOpHash, entryPoint, chainId]
+//   );
+//   return keccak256(enc);
+// }
