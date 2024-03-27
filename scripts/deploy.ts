@@ -36,6 +36,12 @@ async function main() {
 	await nativeSm.waitForDeployment();
 
 	console.log(`nativeSm deployed to ${nativeSm.target}`);
+
+	// const ECDSAsm = await ethers.deployContract("EcdsaOwnershipRegistryModule");
+
+	// await ECDSAsm.waitForDeployment();
+
+	// console.log(`ECDSAsm deployed to ${ECDSAsm.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

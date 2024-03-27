@@ -5,7 +5,12 @@ import { ethers } from "hardhat";
 export const fillUserOp = async (
 	sender: string,
 	initCode: string,
-	network: Network
+	network: Network,
+	callData: {
+		receiver: string;
+		amount: BigInt;
+		data: string;
+	}
 ) => {
 	// Get addresses
 	const epAddress: string = ADDRESSES[network]["EP_ADDRESS"];
@@ -19,9 +24,9 @@ export const fillUserOp = async (
 		nonce: "0x" + (await entryPoint.getNonce(sender, 0)).toString(16),
 		initCode,
 		callData: Account.interface.encodeFunctionData("execute", [
-			"0xF6f94b71bbdc4716dc138A04593a7fb0504F3e43",
-			ethers.parseEther("0.0000001"),
-			"0x",
+			callData.receiver,
+			callData.amount,
+			callData.data,
 		]),
 		// callData: Account.interface.encodeFunctionData("sendEther", [
 		// 	"0xF6f94b71bbdc4716dc138A04593a7fb0504F3e43",
@@ -50,18 +55,5 @@ export const fillUserOp = async (
 	);
 	userOp.maxPriorityFeePerGas = maxPriorityFeePerGas;
 
-	return userOp;
+	return { userOp: userOp, userOpHash: await entryPoint.getUserOpHash(userOp) };
 };
-
-// export function getUserOpHash(
-//   op: UserOperation,
-//   entryPoint: string,
-//   chainId: number
-// ): string {
-//   const userOpHash = keccak256(packUserOp(op, true));
-//   const enc = defaultAbiCoder.encode(
-//     ["bytes32", "address", "uint256"],
-//     [userOpHash, entryPoint, chainId]
-//   );
-//   return keccak256(enc);
-// }
