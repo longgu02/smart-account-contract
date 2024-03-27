@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/utils/Create2.sol";
 import {IAuthorizationModule} from "./interfaces/IAuthorizationModule.sol";
 import {ModuleManager} from "./base/ModuleManager.sol";
 import {SmartAccountErrors} from "./common/Errors.sol";
+import {EcdsaOwnershipRegistryModule} from "./modules/EcdsaOwnershipRegistryModule.sol";
 
 // import {SmartAccount} from "./SmartAccount.sol";
 
@@ -33,8 +34,15 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     IEntryPoint private immutable ENTRY_POINT;
     address private immutable SELF;
 
-    constructor(address _owner, address _entryPointAddress) {
-        owner = _owner;
+    constructor(
+        address _owner,
+        address _initModuleAddress,
+        address _entryPointAddress
+    ) {
+        // owner = _owner;
+        EcdsaOwnershipRegistryModule(_initModuleAddress).initForSmartAccount(
+            _owner
+        );
         ENTRY_POINT = IEntryPoint(_entryPointAddress);
         SELF = address(this);
     }
@@ -74,13 +82,6 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     ) external returns (uint256 validationData) {
         // if (msg.sender != address(entryPoint()))
         //     revert CallerIsNotAnEntryPoint(msg.sender);
-        if (userOp.signature.length < 200) {
-            address recovered = ECDSA.recover(
-                ECDSA.toEthSignedMessageHash(userOpHash),
-                userOp.signature
-            );
-            return owner == recovered ? 0 : 1;
-        }
 
         (, address validationModule) = abi.decode(
             userOp.signature,
@@ -175,6 +176,7 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
 contract AccountFactory {
     function createAccount(
         address owner,
+        address initModuleAddress,
         address entryPoint
     ) external returns (address) {
         bytes32 salt = bytes32(uint256(uint160(owner)));
@@ -182,6 +184,7 @@ contract AccountFactory {
         bytes memory bytecode = abi.encodePacked(
             creationCode,
             abi.encode(owner),
+            abi.encode(initModuleAddress),
             abi.encode(entryPoint)
         );
 

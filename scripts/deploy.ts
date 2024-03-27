@@ -1,23 +1,23 @@
 import { ethers } from "hardhat";
 
 async function main() {
-	// const af = await ethers.deployContract("AccountFactory");
+	const af = await ethers.deployContract("AccountFactory");
 
-	// await af.waitForDeployment();
+	await af.waitForDeployment();
 
-	// console.log(`AF deployed to ${af.target}`);
+	console.log(`AF deployed to ${af.target}`);
 
-	// const ep = await ethers.deployContract("EntryPoint");
+	const ep = await ethers.deployContract("EntryPoint");
 
-	// await ep.waitForDeployment();
+	await ep.waitForDeployment();
 
-	// console.log(`EP deployed to ${ep.target}`);
+	console.log(`EP deployed to ${ep.target}`);
 
-	// const pm = await ethers.deployContract("Paymaster");
+	const pm = await ethers.deployContract("Paymaster");
 
-	// await pm.waitForDeployment();
+	await pm.waitForDeployment();
 
-	// console.log(`PM deployed to ${pm.target}`);
+	console.log(`PM deployed to ${pm.target}`);
 
 	const sm = await ethers.deployContract("SessionKeyManager");
 
@@ -37,11 +37,11 @@ async function main() {
 
 	console.log(`nativeSm deployed to ${nativeSm.target}`);
 
-	// const ECDSAsm = await ethers.deployContract("EcdsaOwnershipRegistryModule");
+	const ECDSAsm = await ethers.deployContract("EcdsaOwnershipRegistryModule");
 
-	// await ECDSAsm.waitForDeployment();
+	await ECDSAsm.waitForDeployment();
 
-	// console.log(`ECDSAsm deployed to ${ECDSAsm.target}`);
+	console.log(`ECDSAsm deployed to ${ECDSAsm.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

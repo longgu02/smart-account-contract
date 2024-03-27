@@ -6,11 +6,12 @@ import {
 
 const FACTORY_NONCE = 1;
 const acc = "0x2b5a3ba1818c8e93bb852ab3b399756641550ceb";
-const AF_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const EP_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-const PM_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-const SM_ADDRESS = "0x07882Ae1ecB7429a84f1D53048d35c4bB2056877";
-const ERC20SM_ADDRESS = "0xA7c59f010700930003b33aB25a7a0679C860f29c";
+const AF_ADDRESS = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const EP_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+const PM_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
+const SM_ADDRESS = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
+const ERC20SM_ADDRESS = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
+const ECDSASM_ADDRESS = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788";
 
 async function main() {
 	const [signer0, sessionKey, signer2] = await ethers.getSigners();
@@ -46,6 +47,7 @@ async function main() {
 	const code = await ethers.provider.getCode(sender);
 	if (code !== "0x") {
 		initCode = "0x";
+	} else {
 	}
 
 	const { merkleTree, data } = genMerkleTree(
@@ -156,11 +158,14 @@ async function main() {
 	// 	),
 	// });
 
+	// const signatureWithModuleAddress = defaultAbi.encode(
+	// 	["bytes", "address"],
+	// 	[paddedSig, SM_ADDRESS]
+	// );
 	const signatureWithModuleAddress = defaultAbi.encode(
 		["bytes", "address"],
-		[paddedSig, SM_ADDRESS]
+		[await signer0.signMessage(ethers.getBytes(userOpHash)), ECDSASM_ADDRESS]
 	);
-
 	// console.log({
 	// 	sessionKeySig,
 	// 	paddedSig,
