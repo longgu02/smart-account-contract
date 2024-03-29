@@ -107,7 +107,7 @@ export const fillAndSignNativeSessionUserOp = async (
 		network,
 		callData
 	);
-	return signNativeSessionUserOp(
+	return await signNativeSessionUserOp(
 		userOp,
 		userOpHash,
 		sessionSigner,

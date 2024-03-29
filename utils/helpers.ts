@@ -7,3 +7,5 @@ export const getEntryPoint = async () => {
 	);
 	return entryPoint;
 };
+
+export const getModuleAddress = () => {};

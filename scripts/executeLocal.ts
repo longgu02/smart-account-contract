@@ -17,6 +17,10 @@ async function main() {
 	const [signer0, sessionKey, signer2] = await ethers.getSigners();
 	// CREATE: hash(deployer + nonce)
 	const AccountFactory = await ethers.getContractFactory("AccountFactory");
+	const ECDSAValidationContract = await ethers.getContractAt(
+		"EcdsaOwnershipRegistryModule",
+		ECDSASM_ADDRESS
+	);
 	const address0 = await signer0.getAddress();
 	console.log(address0);
 	const entryPoint = await ethers.getContractAt("EntryPoint", EP_ADDRESS);
@@ -26,10 +30,21 @@ async function main() {
 		value: ethers.parseEther("10"), // Sends 1 Ether
 	};
 
+	const ecdsaOwnerInitData =
+		ECDSAValidationContract.interface.encodeFunctionData(
+			"initForSmartAccount",
+			[signer0]
+		);
+
 	let initCode =
 		AF_ADDRESS +
 		AccountFactory.interface
-			.encodeFunctionData("createAccount", [address0, EP_ADDRESS])
+			.encodeFunctionData("createAccount", [
+				address0,
+				ECDSASM_ADDRESS,
+				ecdsaOwnerInitData,
+				EP_ADDRESS,
+			])
 			.slice(2);
 	let sender: any;
 

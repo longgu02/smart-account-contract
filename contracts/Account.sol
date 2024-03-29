@@ -171,6 +171,32 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     //     if (msg.sender != address(entryPoint()))
     //         revert CallerIsNotEntryPoint(msg.sender);
     // }
+    function executeBatch(
+        address[] calldata dest,
+        uint256[] calldata value,
+        bytes[] calldata func
+    ) external {
+        executeBatch_y6U(dest, value, func);
+    }
+
+    function executeBatch_y6U(
+        address[] calldata dest,
+        uint256[] calldata value,
+        bytes[] calldata func
+    ) public {
+        // _requireFromEntryPoint();
+        if (
+            dest.length == 0 ||
+            dest.length != value.length ||
+            value.length != func.length
+        ) revert WrongBatchProvided(dest.length, value.length, func.length, 0);
+        for (uint256 i; i < dest.length; ) {
+            _call(dest[i], value[i], func[i]);
+            unchecked {
+                ++i;
+            }
+        }
+    }
 }
 
 contract AccountFactory {
