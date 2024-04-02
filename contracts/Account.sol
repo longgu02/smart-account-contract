@@ -13,23 +13,29 @@ import {IAuthorizationModule} from "./interfaces/IAuthorizationModule.sol";
 import {ModuleManager} from "./base/ModuleManager.sol";
 import {SmartAccountErrors} from "./common/Errors.sol";
 import {EcdsaOwnershipRegistryModule} from "./modules/EcdsaOwnershipRegistryModule.sol";
+// Plugins
+import {PluginManagerInternals} from "./plugins/PluginManagerInternals.sol";
+import {AccountStorage, HookGroup, getAccountStorage, getPermittedCallKey} from "./plugins/AccountStorage.sol";
+import {AccountStorageInitializable} from "./plugins/AccountStorageInitializable.sol";
+import {AccountExecutor} from "./plugins/AccountExecutor.sol";
+import {AccountLoupe} from "./plugins/AccountLoupe.sol";
+import {FunctionReferenceLib} from "./helpers/FunctionReferenceLib.sol";
+import {FunctionReference, IPluginManager} from "./interfaces/IPluginManager.sol";
+import {IPlugin, PluginManifest} from "./interfaces/IPlugin.sol";
 
-// import {SmartAccount} from "./SmartAccount.sol";
-
-contract Test {
-    constructor(bytes memory sig) {
-        address recover = ECDSA.recover(
-            ECDSA.toEthSignedMessageHash(keccak256("wee")),
-            sig
-        );
-        console.log(recover);
-    }
-}
-
-contract Account is IAccount, ModuleManager, SmartAccountErrors {
+contract Account is
+    AccountExecutor,
+    AccountLoupe,
+    IAccount,
+    ModuleManager,
+    SmartAccountErrors,
+    AccountStorageInitializable,
+    PluginManagerInternals
+{
     uint public count;
     address public owner;
     mapping(address => bool) public signable;
+    IEntryPoint private immutable _ENTRY_POINT;
 
     IEntryPoint private immutable ENTRY_POINT;
     address private immutable SELF;
@@ -43,6 +49,7 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
         EcdsaOwnershipRegistryModule(_initModuleAddress).initForSmartAccount(
             _owner
         );
+
         ENTRY_POINT = IEntryPoint(_entryPointAddress);
         SELF = address(this);
     }
@@ -60,6 +67,69 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
     function enableModule(address module) external virtual override {
         // _requireFromEntryPointOrSelf();
         _enableModule(module);
+    }
+
+    event ModularAccountInitialized(IEntryPoint indexed entryPoint);
+
+    function initialize(
+        address[] memory plugins,
+        bytes32[] memory manifestHashes,
+        bytes[] memory pluginInstallDatas
+    ) external initializer {
+        uint256 length = plugins.length;
+
+        if (
+            length != manifestHashes.length ||
+            length != pluginInstallDatas.length
+        ) {
+            revert ArrayLengthMismatch();
+        }
+
+        FunctionReference[] memory emptyDependencies = new FunctionReference[](
+            0
+        );
+
+        for (uint256 i = 0; i < length; ) {
+            _installPlugin(
+                plugins[i],
+                manifestHashes[i],
+                pluginInstallDatas[i],
+                emptyDependencies
+            );
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        emit ModularAccountInitialized(ENTRY_POINT);
+    }
+
+    /// @inheritdoc IPluginManager
+    function installPlugin(
+        address plugin,
+        bytes32 manifestHash,
+        bytes calldata pluginInstallData,
+        FunctionReference[] calldata dependencies // wrapNativeFunction
+    ) external override {
+        _installPlugin(plugin, manifestHash, pluginInstallData, dependencies);
+    }
+
+    /// @inheritdoc IPluginManager
+    function uninstallPlugin(
+        address plugin,
+        bytes calldata config,
+        bytes calldata pluginUninstallData // wrapNativeFunction
+    ) external override {
+        PluginManifest memory manifest;
+
+        if (config.length > 0) {
+            manifest = abi.decode(config, (PluginManifest));
+        } else {
+            manifest = IPlugin(plugin).pluginManifest();
+        }
+
+        _uninstallPlugin(plugin, manifest, pluginUninstallData);
     }
 
     /**
@@ -93,43 +163,7 @@ contract Account is IAccount, ModuleManager, SmartAccountErrors {
             userOp,
             userOpHash
         );
-        // } else {
-        // revert WrongValidationModule(validationModule);
-        // return 1;
-        // }
-
-        // // Check nonce requirement if any
-        // _payPrefund(missingAccountFunds);
     }
-
-    // function addSigner(address signer) external {
-    //     require(msg.sender == owner, "Forbidden: Caller must be an owner");
-    //     signable[signer] = true;
-    // }
-
-    // function sendERC20(
-    //     address payable _to,
-    //     address addERC20,
-    //     uint256 _amount
-    // ) public {
-    //     // Create an instance of the ERC20 token contract
-    //     IERC20 token = IERC20(addERC20);
-
-    //     // Transfer the tokens
-    //     require(token.transfer(_to, _amount), "Transfer failed");
-    // }
-
-    // function sendEther(address payable _to, uint256 _amount) public {
-    //     require(
-    //         address(this).balance >= _amount,
-    //         "Insufficient balance in contract"
-    //     );
-    //     _to.transfer(_amount);
-    // }
-
-    // function execute() external {
-    //     count += 10;
-    // }
 
     function _call(address target, uint256 value, bytes memory data) internal {
         assembly {

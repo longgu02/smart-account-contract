@@ -124,10 +124,10 @@ contract SmartAccountErrors is BaseSmartAccountErrors, ModuleManagerErrors {
      */
     error CallerIsNotEntryPoint(address caller);
 
-    /**
-     * @notice Throws if trying to initialize a Smart Account that has already been initialized
-     */
-    error AlreadyInitialized();
+    // /**
+    //  * @notice Throws if trying to initialize a Smart Account that has already been initialized
+    //  */
+    // error AlreadyInitialized();
 
     /**
      * @notice Throws if contract signature is provided in frong format
