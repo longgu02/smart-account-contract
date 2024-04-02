@@ -5,17 +5,17 @@ import {
 } from "../utils/sessionKey";
 
 const FACTORY_NONCE = 1;
-const acc = "0x15ae0f06d83c9f5b03180fb66cf4b2d6a7ae580a";
-const AF_ADDRESS = "0x9d4454B023096f34B160D6B654540c56A1F81688";
-const EP_ADDRESS = "0xc5a5C42992dECbae36851359345FE25997F5C42d";
-const PM_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933";
-const SM_ADDRESS = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";
-const ERC20SM_ADDRESS = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
-const NATIVESM_ADDRESS = "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB";
-const ECDSASM_ADDRESS = "0x9E545E3C0baAB3E08CdfD552C960A1050f373042";
+const acc = "0x21e12ec5793b7644de1eb22b246dc0e4e3b08eba";
+const AF_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const EP_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+const PM_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+const SM_ADDRESS = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
+const ERC20SM_ADDRESS = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const NATIVESM_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+const ECDSASM_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
 
 async function main() {
-	const [signer0, sessionKey, signer2] = await ethers.getSigners();
+	const [signer0, signer1, signer2] = await ethers.getSigners();
 	// CREATE: hash(deployer + nonce)
 	const AccountFactory = await ethers.getContractFactory("AccountFactory");
 	const ECDSAValidationContract = await ethers.getContractAt(
@@ -77,10 +77,10 @@ async function main() {
 		sender, // smart account address
 		nonce: await entryPoint.getNonce(sender, 0),
 		initCode,
-		callData: Account.interface.encodeFunctionData("execute", [
-			await signer2.getAddress(),
-			ethers.parseEther("0"),
-			"0x",
+		callData: Account.interface.encodeFunctionData("executeBatch", [
+			[await signer1.getAddress(), await signer1.getAddress()],
+			[ethers.parseEther("4"), ethers.parseEther("3")],
+			["0x", "0x"],
 		]),
 		callGasLimit: 900_000 * 4,
 		verificationGasLimit: 900_000 * 4,
@@ -92,9 +92,6 @@ async function main() {
 	};
 
 	const userOpHash = await entryPoint.getUserOpHash(userOp);
-	const sessionKeySig = await sessionKey.signMessage(
-		ethers.getBytes(userOpHash)
-	);
 
 	const defaultAbi = ethers.AbiCoder.defaultAbiCoder();
 
