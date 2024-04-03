@@ -7,9 +7,11 @@ const PM_ADDRESS = "0x07f05bf62Cc6c427679AedEA3753Ad4644E77a6b";
 const INFURA_API_KEY = process.env.INFURA_API_KEY;
 
 async function main() {
-	const listEP = await ethers.provider.send("eth_supportedEntryPoints");
+	const test = await ethers.deployContract("Test");
+	await test.waitForDeployment();
 
-	console.log(listEP);
+	const tx = await test.pluginManifest();
+	console.log(tx);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

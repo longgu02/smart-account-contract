@@ -8,16 +8,17 @@ import { ISingleOwnerPlugin } from "../typechain-types";
 import { pack } from "../utils/helpers";
 
 const FACTORY_NONCE = 1;
-const acc = "0x42b662c7a8d1ddb96b1bbce7fb5afc501479449d";
-const AF_ADDRESS = "0x4b6aB5F819A515382B0dEB6935D793817bB4af28";
+const acc = "0xfacff941e53707bc22e21d45aa8573bc4e477e34";
+const AF_ADDRESS = "0xc7cDb7A2E5dDa1B7A0E792Fe1ef08ED20A6F56D4";
 const EP_ADDRESS = "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f";
 const PM_ADDRESS = "0x4A679253410272dd5232B3Ff7cF5dbB88f295319";
 const SM_ADDRESS = "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F";
 const ERC20SM_ADDRESS = "0x09635F643e140090A9A8Dcd712eD6285858ceBef";
 const NATIVESM_ADDRESS = "0xc5a5C42992dECbae36851359345FE25997F5C42d";
 const ECDSASM_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933";
-const SP_ADDRESS = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";
+const SP_ADDRESS = "0x56fC17a65ccFEC6B7ad0aDe9BD9416CB365B9BE8";
 const CTPLUGIN_ADDRESS = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
+const SUBPLUGIN_ADDRESS = "0x638A246F0Ec8883eF68280293FFE8Cfbabe61B44";
 
 async function main() {
 	const [signer0, signer1, signer2] = await ethers.getSigners();
@@ -29,12 +30,17 @@ async function main() {
 		"CounterPlugin",
 		CTPLUGIN_ADDRESS
 	);
+	const subscriptionPlugin = await ethers.getContractAt(
+		"SubscriptionPlugin",
+		SUBPLUGIN_ADDRESS
+	);
 	const SingleOwnerPlugin = await ethers.getContractAt(
 		"SingleOwnerPlugin",
 		"0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
 	);
 
-	const pluginManifest = await counterPlugin.pluginManifest();
+	const pluginManifest = await subscriptionPlugin.pluginManifest();
+	const subscriptionManifest = await subscriptionPlugin.pluginManifest();
 	const types = [
 		"bytes4[]", // interfaceIds
 		"bytes4[]", // dependencyInterfaceIds
@@ -49,30 +55,6 @@ async function main() {
 		"tuple(bytes4,tuple(uint8,uint8,uint256))[]", // preRuntimeValidationHooks
 		"tuple(bytes4,tuple(uint8,uint8,uint256),tuple(uint8,uint8,uint256))[]", // executionHooks
 	];
-
-	const manifestType = [
-		"tuple(bytes4[],bytes4[],bytes4[],bytes4[],bool,bool,tuple(address,bool,bytes4[])[],tuple(address,bool,bytes4[])[],tuple(address,bool,bytes4[])[],tuple(address,bool,bytes4[])[]),tuple(bytes4,tuple(bytes4,uint8,bytes21),tuple(bytes4,uint8,bytes21))[]",
-	];
-
-	const pluginManifestObject = {
-		interfaceIds: pluginManifest[0],
-		dependencyInterfaceIds: pluginManifest[1],
-		executionFunctions: pluginManifest[2],
-		permittedExecutionSelectors: pluginManifest[3],
-		permitAnyExternalAddress: pluginManifest[4],
-		canSpendNativeToken: pluginManifest[5],
-		permittedExternalCalls: pluginManifest[6],
-		userOpValidationFunctions: {
-			executionSelector: pluginManifest[7][0][1],
-			haha: pluginManifest[7][0][1],
-		},
-		runtimeValidationFunctions: pluginManifest[8],
-		preUserOpValidationHooks: pluginManifest[9],
-		preRuntimeValidationHooks: {
-			executionSelector: pluginManifest[10][0][1],
-		},
-		executionHooks: pluginManifest[11],
-	};
 
 	const result: any[][][][] = [];
 
@@ -129,24 +111,25 @@ async function main() {
 			result[index1] = attr;
 		}
 	});
-	console.log({ pluginManifest });
+	console.log({ subscriptionManifest });
 	console.log({ result });
 
 	// const encoded = defaultAbi.encode(types, [...pluginManifest]);
-	const encoded = defaultAbi.encode(types, [
-		[],
-		["0xf23b1ed7"],
-		["0xd09de08a"],
-		[],
-		false,
-		false,
-		[],
-		[["0xd09de08a", [2, 0, 0]]],
-		[],
-		[],
-		[["0xd09de08a", [4, 0, 0]]],
-		[],
-	]);
+	// const encoded = defaultAbi.encode(types, [
+	// 	[],
+	// 	["0xf23b1ed7"],
+	// 	["0xd09de08a"],
+	// 	[],
+	// 	false,
+	// 	false,
+	// 	[],
+	// 	[["0xd09de08a", [2, 0, 0]]],
+	// 	[],
+	// 	[],
+	// 	[["0xd09de08a", [4, 0, 0]]],
+	// 	[],
+	// ]);
+	const encoded = defaultAbi.encode(types, subscriptionManifest);
 	const manifestHash = ethers.keccak256(
 		"0x0000000000000000000000000000000000000000000000000000000000000020" +
 			encoded.slice(2)
@@ -168,7 +151,9 @@ async function main() {
 		),
 	];
 	// const dep = defaultAbi.encode(["bytes21"], functionReferenceLib);
-	console.log(encoded);
+	console.log({
+		manifestHash,
+	});
 	console.log({
 		plugin: CTPLUGIN_ADDRESS,
 		manifestHash: manifestHash,
@@ -214,16 +199,6 @@ async function main() {
 		// sender = "0x" + ex.data.slice(-40)
 	}
 
-	// const accountContract = await ethers.getContractAt("Account", sender);
-	// const tx2 = await accountContract.installPlugin(
-	// 	CTPLUGIN_ADDRESS,
-	// 	manifestHash,
-	// 	"0x",
-	// 	dependencies
-	// );
-
-	// const rec = await tx2.wait();
-	// console.log(rec);
 	console.log({ sender });
 
 	const code = await ethers.provider.getCode(sender);
@@ -241,7 +216,9 @@ async function main() {
 	});
 
 	const CounterPlugin = await ethers.getContractFactory("CounterPlugin");
-
+	const SubscriptionPlugin = await ethers.getContractFactory(
+		"SubscriptionPlugin"
+	);
 	const userOp = {
 		sender, // smart account address
 		nonce: await entryPoint.getNonce(sender, 0),
@@ -252,9 +229,12 @@ async function main() {
 		// 	"0x",
 		// ]),
 		callData: Account.interface.encodeFunctionData("execute", [
-			CTPLUGIN_ADDRESS,
+			SUBPLUGIN_ADDRESS,
 			ethers.parseEther("0"),
-			CounterPlugin.interface.encodeFunctionData("increment", []),
+			SubscriptionPlugin.interface.encodeFunctionData("subscribe", [
+				signer1.address,
+				ethers.parseEther("7"),
+			]),
 		]),
 		// callData: Account.interface.encodeFunctionData("executeBatch", [
 		// 	[await signer1.getAddress(), await signer1.getAddress()],
@@ -301,6 +281,21 @@ async function main() {
 	const tx = await entryPoint.handleOps([userOp], address0);
 	const receipt = await tx.wait();
 	console.log(receipt);
+
+	const accountContract = await ethers.getContractAt(
+		"Account",
+		sender,
+		signer1
+	);
+	const tx2 = await accountContract.installPlugin(
+		SUBPLUGIN_ADDRESS,
+		manifestHash,
+		"0x",
+		dependencies
+	);
+
+	const rec = await tx2.wait();
+	console.log(rec);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

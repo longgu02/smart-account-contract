@@ -18,7 +18,7 @@ abstract contract PluginManagerInternals is IPluginManager {
     error ArrayLengthMismatch();
     error ExecutionFunctionAlreadySet(bytes4 selector);
     error InvalidDependenciesProvided();
-    error InvalidPluginManifest();
+    error InvalidPluginManifest(uint);
     error MissingPluginDependency(address dependency);
     error NullFunctionReference();
     error NullPlugin();
@@ -274,7 +274,7 @@ abstract contract PluginManagerInternals is IPluginManager {
         // Check manifest hash.
         PluginManifest memory manifest = IPlugin(plugin).pluginManifest();
         if (!_isValidPluginManifest(manifest, manifestHash)) {
-            revert InvalidPluginManifest();
+            revert InvalidPluginManifest(1);
         }
 
         // Check that the dependencies match the manifest.
@@ -528,7 +528,7 @@ abstract contract PluginManagerInternals is IPluginManager {
         // Check manifest hash.
         bytes32 manifestHash = _storage.pluginData[plugin].manifestHash;
         if (!_isValidPluginManifest(manifest, manifestHash)) {
-            revert InvalidPluginManifest();
+            revert InvalidPluginManifest(2);
         }
 
         // Ensure that there are no dependent plugins.
@@ -809,7 +809,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             ManifestAssociatedFunctionType.DEPENDENCY
         ) {
             if (manifestFunction.dependencyIndex >= dependencies.length) {
-                revert InvalidPluginManifest();
+                revert InvalidPluginManifest(3);
             }
             return dependencies[manifestFunction.dependencyIndex];
         } else if (
@@ -822,7 +822,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             ) {
                 return FunctionReferenceLib._RUNTIME_VALIDATION_ALWAYS_ALLOW;
             } else {
-                revert InvalidPluginManifest();
+                revert InvalidPluginManifest(4);
             }
         } else if (
             manifestFunction.functionType ==
@@ -834,7 +834,7 @@ abstract contract PluginManagerInternals is IPluginManager {
             ) {
                 return FunctionReferenceLib._PRE_HOOK_ALWAYS_DENY;
             } else {
-                revert InvalidPluginManifest();
+                revert InvalidPluginManifest(5);
             }
         }
         return FunctionReferenceLib._EMPTY_FUNCTION_REFERENCE; // Empty checks are done elsewhere

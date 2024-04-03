@@ -1,7 +1,8 @@
 import { ethers } from "hardhat";
 
+const SP_ADDRESS = "0x56fC17a65ccFEC6B7ad0aDe9BD9416CB365B9BE8";
 async function main() {
-	const af = await ethers.deployContract("AccountFactory");
+	const af = await ethers.deployContract("AccountFactory", [SP_ADDRESS]);
 
 	await af.waitForDeployment();
 
@@ -43,9 +44,7 @@ async function main() {
 
 	// console.log(`ECDSAsm deployed to ${ECDSAsm.target}`);
 
-	// const SingleOwnerPlugin = await ethers.deployContract(
-	// 	"EcdsaOwnershipRegistryModule"
-	// );
+	// const SingleOwnerPlugin = await ethers.deployContract("SingleOwnerPlugin");
 
 	// await SingleOwnerPlugin.waitForDeployment();
 
@@ -56,6 +55,12 @@ async function main() {
 	// await counterPlugin.waitForDeployment();
 
 	// console.log(`counterPlugin deployed to ${counterPlugin.target}`);
+
+	const SubscriptionPlugin = await ethers.deployContract("SubscriptionPlugin");
+
+	await SubscriptionPlugin.waitForDeployment();
+
+	console.log(`SubscriptionPlugin deployed to ${SubscriptionPlugin.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
