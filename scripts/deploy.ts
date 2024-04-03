@@ -7,41 +7,55 @@ async function main() {
 
 	console.log(`AF deployed to ${af.target}`);
 
-	const ep = await ethers.deployContract("EntryPoint");
+	// const ep = await ethers.deployContract("EntryPoint");
 
-	await ep.waitForDeployment();
+	// await ep.waitForDeployment();
 
-	console.log(`EP deployed to ${ep.target}`);
+	// console.log(`EP deployed to ${ep.target}`);
 
-	const pm = await ethers.deployContract("Paymaster");
+	// const pm = await ethers.deployContract("Paymaster");
 
-	await pm.waitForDeployment();
+	// await pm.waitForDeployment();
 
-	console.log(`PM deployed to ${pm.target}`);
+	// console.log(`PM deployed to ${pm.target}`);
 
-	const sm = await ethers.deployContract("SessionKeyManager");
+	// const sm = await ethers.deployContract("SessionKeyManager");
 
-	await sm.waitForDeployment();
+	// await sm.waitForDeployment();
 
-	console.log(`SM deployed to ${sm.target}`);
+	// console.log(`SM deployed to ${sm.target}`);
 
-	const erc20sm = await ethers.deployContract("ERC20SessionValidationModule");
+	// const erc20sm = await ethers.deployContract("ERC20SessionValidationModule");
 
-	await erc20sm.waitForDeployment();
+	// await erc20sm.waitForDeployment();
 
-	console.log(`erc20sm deployed to ${erc20sm.target}`);
+	// console.log(`erc20sm deployed to ${erc20sm.target}`);
 
-	const nativeSm = await ethers.deployContract("NativeSessionValidationModule");
+	// const nativeSm = await ethers.deployContract("NativeSessionValidationModule");
 
-	await nativeSm.waitForDeployment();
+	// await nativeSm.waitForDeployment();
 
-	console.log(`nativeSm deployed to ${nativeSm.target}`);
+	// console.log(`nativeSm deployed to ${nativeSm.target}`);
 
-	const ECDSAsm = await ethers.deployContract("EcdsaOwnershipRegistryModule");
+	// const ECDSAsm = await ethers.deployContract("EcdsaOwnershipRegistryModule");
 
-	await ECDSAsm.waitForDeployment();
+	// await ECDSAsm.waitForDeployment();
 
-	console.log(`ECDSAsm deployed to ${ECDSAsm.target}`);
+	// console.log(`ECDSAsm deployed to ${ECDSAsm.target}`);
+
+	// const SingleOwnerPlugin = await ethers.deployContract(
+	// 	"EcdsaOwnershipRegistryModule"
+	// );
+
+	// await SingleOwnerPlugin.waitForDeployment();
+
+	// console.log(`SingleOwnerPlugin deployed to ${SingleOwnerPlugin.target}`);
+
+	// const counterPlugin = await ethers.deployContract("CounterPlugin");
+
+	// await counterPlugin.waitForDeployment();
+
+	// console.log(`counterPlugin deployed to ${counterPlugin.target}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

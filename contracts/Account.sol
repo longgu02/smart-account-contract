@@ -22,6 +22,8 @@ import {AccountLoupe} from "./plugins/AccountLoupe.sol";
 import {FunctionReferenceLib} from "./helpers/FunctionReferenceLib.sol";
 import {FunctionReference, IPluginManager} from "./interfaces/IPluginManager.sol";
 import {IPlugin, PluginManifest} from "./interfaces/IPlugin.sol";
+// Factory
+import {SingleOwnerPlugin} from "./plugins/base/owner/SingleOwnerPlugin.sol";
 
 contract Account is
     AccountExecutor,
@@ -234,10 +236,90 @@ contract Account is
 }
 
 contract AccountFactory {
+    // Account public accountImplementation;
+    SingleOwnerPlugin public singleOwnerPlugin;
+
+    // address internal singleOwnerPluginAddress;
+    // constructor(address entryPoint, address singleOwnerPluginAddress) {
+    //     singleOwnerPlugin = SingleOwnerPlugin(singleOwnerPluginAddress);
+    // }
+
+    // bytes32 private immutable _PROXY_BYTECODE_HASH;
+
+    // uint32 public constant UNSTAKE_DELAY = 1 weeks;
+
+    // IEntryPoint public entryPoint;
+
+    // address public self;
+
+    // bytes32 public singleOwnerPluginManifestHash;
+
+    // constructor(IEntryPoint _entryPoint, SingleOwnerPlugin _singleOwnerPlugin) {
+    //     entryPoint = _entryPoint;
+    //     accountImplementation = _deployUpgradeableModularAccount(_entryPoint);
+    //     _PROXY_BYTECODE_HASH = keccak256(
+    //         abi.encodePacked(
+    //             type(ERC1967Proxy).creationCode,
+    //             abi.encode(address(accountImplementation), "")
+    //         )
+    //     );
+    //     singleOwnerPlugin = _singleOwnerPlugin;
+    //     self = address(this);
+    //     // The manifest hash is set this way in this factory just for testing purposes.
+    //     // For production factories the manifest hashes should be passed as a constructor argument.
+    //     singleOwnerPluginManifestHash = keccak256(
+    //         abi.encode(singleOwnerPlugin.pluginManifest())
+    //     );
+    // }
+
+    // /**
+    //  * create an account, and return its address.
+    //  * returns the address even if the account is already deployed.
+    //  * Note that during UserOperation execution, this method is called only if the account is not deployed.
+    //  * This method returns an existing account address so that entryPoint.getSenderAddress() would work even after
+    //  * account creation
+    //  */
+    // function createAccount(
+    //     address owner,
+    //     uint256 salt
+    // ) public returns (UpgradeableModularAccount) {
+    //     address addr = Create2.computeAddress(
+    //         getSalt(owner, salt),
+    //         _PROXY_BYTECODE_HASH
+    //     );
+
+    //     // short circuit if exists
+    //     if (addr.code.length == 0) {
+    //         address[] memory plugins = new address[](1);
+    //         plugins[0] = address(singleOwnerPlugin);
+    //         bytes32[] memory pluginManifestHashes = new bytes32[](1);
+    //         pluginManifestHashes[0] = keccak256(
+    //             abi.encode(singleOwnerPlugin.pluginManifest())
+    //         );
+    //         bytes[] memory pluginInstallData = new bytes[](1);
+    //         pluginInstallData[0] = abi.encode(owner);
+    //         // not necessary to check return addr since next call will fail if so
+    //         new ERC1967Proxy{salt: getSalt(owner, salt)}(
+    //             address(accountImplementation),
+    //             ""
+    //         );
+
+    //         // point proxy to actual implementation and init plugins
+    //         UpgradeableModularAccount(payable(addr)).initialize(
+    //             plugins,
+    //             pluginManifestHashes,
+    //             pluginInstallData
+    //         );
+    //     }
+
+    //     return UpgradeableModularAccount(payable(addr));
+    // }
+
     function createAccount(
         address owner,
         address initModuleAddress,
-        address entryPoint
+        address entryPoint,
+        address singleOwnerPluginAddress
     ) external returns (address) {
         bytes32 salt = bytes32(uint256(uint160(owner)));
         bytes memory creationCode = type(Account).creationCode;
@@ -253,8 +335,22 @@ contract AccountFactory {
         if (codeSize > 0) {
             return addr;
         }
+        address acc = deploy(salt, bytecode);
+        // address[] memory plugins = new address[](1);
+        // singleOwnerPlugin = SingleOwnerPlugin(singleOwnerPluginAddress);
 
-        return deploy(salt, bytecode);
+        // plugins[0] = singleOwnerPluginAddress;
+        // bytes32[] memory pluginManifestHashes = new bytes32[](1);
+        // pluginManifestHashes[0] = keccak256(
+        //     abi.encode(singleOwnerPlugin.pluginManifest())
+        // );
+        // bytes[] memory pluginInstallData = new bytes[](1);
+        // pluginInstallData[0] = abi.encode(owner);
+
+        // Account account = Account(payable(acc));
+        // account.initialize(plugins, pluginManifestHashes, pluginInstallData);
+
+        return acc;
     }
 
     function deploy(

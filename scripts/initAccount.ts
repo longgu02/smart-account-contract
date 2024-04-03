@@ -6,13 +6,15 @@ import {
 
 const FACTORY_NONCE = 1;
 const acc = "0x21e12ec5793b7644de1eb22b246dc0e4e3b08eba";
-const AF_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const EP_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-const PM_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-const SM_ADDRESS = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
-const ERC20SM_ADDRESS = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
-const NATIVESM_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
-const ECDSASM_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
+const AF_ADDRESS = "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB";
+const EP_ADDRESS = "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f";
+const PM_ADDRESS = "0x4A679253410272dd5232B3Ff7cF5dbB88f295319";
+const SM_ADDRESS = "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F";
+const ERC20SM_ADDRESS = "0x09635F643e140090A9A8Dcd712eD6285858ceBef";
+const NATIVESM_ADDRESS = "0xc5a5C42992dECbae36851359345FE25997F5C42d";
+const ECDSASM_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933";
+const SP_ADDRESS = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";
+const CTPLUGIN_ADDRESS = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
 
 async function main() {
 	const [signer0, signer1, signer2] = await ethers.getSigners();
@@ -44,6 +46,7 @@ async function main() {
 				address0,
 				ECDSASM_ADDRESS,
 				EP_ADDRESS,
+				SP_ADDRESS,
 			])
 			.slice(2);
 	let sender: any;
@@ -58,6 +61,17 @@ async function main() {
 	}
 
 	console.log({ sender });
+	// const accountFactory = await ethers.getContractAt(
+	// 	"AccountFactory",
+	// 	AF_ADDRESS
+	// );
+	// const teich = await accountFactory.createAccount(
+	// 	address0,
+	// 	ECDSASM_ADDRESS,
+	// 	EP_ADDRESS,
+	// 	SP_ADDRESS
+	// );
+	// const re = await teich.wait();
 
 	const code = await ethers.provider.getCode(sender);
 	if (code !== "0x") {
@@ -82,11 +96,11 @@ async function main() {
 			[ethers.parseEther("4"), ethers.parseEther("3")],
 			["0x", "0x"],
 		]),
-		callGasLimit: 900_000 * 4,
-		verificationGasLimit: 900_000 * 4,
-		preVerificationGas: 400_000 * 4,
-		maxFeePerGas: ethers.parseUnits("100", "gwei"),
-		maxPriorityFeePerGas: ethers.parseUnits("50", "gwei"),
+		callGasLimit: 900_000 * 10,
+		verificationGasLimit: 900_000 * 10,
+		preVerificationGas: 400_000 * 10,
+		maxFeePerGas: ethers.parseUnits("1000", "gwei"),
+		maxPriorityFeePerGas: ethers.parseUnits("500", "gwei"),
 		paymasterAndData: PM_ADDRESS, // PM_ADDRESS
 		signature: "0x",
 	};
