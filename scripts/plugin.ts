@@ -9,16 +9,16 @@ import { pack } from "../utils/helpers";
 
 const FACTORY_NONCE = 1;
 const acc = "0xfacff941e53707bc22e21d45aa8573bc4e477e34";
-const AF_ADDRESS = "0xc7cDb7A2E5dDa1B7A0E792Fe1ef08ED20A6F56D4";
-const EP_ADDRESS = "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f";
-const PM_ADDRESS = "0x4A679253410272dd5232B3Ff7cF5dbB88f295319";
-const SM_ADDRESS = "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F";
-const ERC20SM_ADDRESS = "0x09635F643e140090A9A8Dcd712eD6285858ceBef";
-const NATIVESM_ADDRESS = "0xc5a5C42992dECbae36851359345FE25997F5C42d";
-const ECDSASM_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933";
-const SP_ADDRESS = "0x56fC17a65ccFEC6B7ad0aDe9BD9416CB365B9BE8";
-const CTPLUGIN_ADDRESS = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
-const SUBPLUGIN_ADDRESS = "0x638A246F0Ec8883eF68280293FFE8Cfbabe61B44";
+export const AF_ADDRESS = "0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5";
+export const SP_ADDRESS = "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650";
+export const EP_ADDRESS = "0xFD471836031dc5108809D173A067e8486B9047A3";
+export const PM_ADDRESS = "0xcbEAF3BDe82155F56486Fb5a1072cb8baAf547cc";
+export const SM_ADDRESS = "0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f";
+export const ERC20SM_ADDRESS = "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07";
+export const NATIVESM_ADDRESS = "0x162A433068F51e18b7d13932F27e66a3f99E6890";
+export const ECDSASM_ADDRESS = "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe";
+export const CTPLUGIN_ADDRESS = "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f";
+export const SUBPLUGIN_ADDRESS = "0x1fA02b2d6A771842690194Cf62D91bdd92BfE28d";
 
 async function main() {
 	const [signer0, signer1, signer2] = await ethers.getSigners();
@@ -185,7 +185,6 @@ async function main() {
 				address0,
 				ECDSASM_ADDRESS,
 				EP_ADDRESS,
-				SP_ADDRESS,
 			])
 			.slice(2);
 	let sender: any;
@@ -228,13 +227,19 @@ async function main() {
 		// 	ethers.parseEther("0"),
 		// 	"0x",
 		// ]),
-		callData: Account.interface.encodeFunctionData("execute", [
+		// callData: Account.interface.encodeFunctionData("execute", [
+		// 	SUBPLUGIN_ADDRESS,
+		// 	ethers.parseEther("0"),
+		// 	SubscriptionPlugin.interface.encodeFunctionData("subscribe", [
+		// 		signer1.address,
+		// 		ethers.parseEther("7"),
+		// 	]),
+		// ]),
+		callData: Account.interface.encodeFunctionData("installPlugin", [
 			SUBPLUGIN_ADDRESS,
-			ethers.parseEther("0"),
-			SubscriptionPlugin.interface.encodeFunctionData("subscribe", [
-				signer1.address,
-				ethers.parseEther("7"),
-			]),
+			manifestHash,
+			"0x",
+			dependencies,
 		]),
 		// callData: Account.interface.encodeFunctionData("executeBatch", [
 		// 	[await signer1.getAddress(), await signer1.getAddress()],

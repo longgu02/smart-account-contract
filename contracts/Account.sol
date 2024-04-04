@@ -368,6 +368,13 @@ contract Account is
         }
     }
 
+    function checkPluginInstalled(
+        address pluginAddress
+    ) external view returns (bool) {
+        bool result = _checkPluginInstalled(pluginAddress);
+        return result;
+    }
+
     // function _doPreExecHooks(
     //     bytes4 selector,
     //     bytes calldata data
@@ -509,8 +516,7 @@ contract AccountFactory {
     function createAccount(
         address owner,
         address initModuleAddress,
-        address entryPoint,
-        address singleOwnerPluginAddress
+        address entryPoint
     ) external returns (address) {
         bytes32 salt = bytes32(uint256(uint160(owner)));
         bytes memory creationCode = type(Account).creationCode;
@@ -527,10 +533,10 @@ contract AccountFactory {
             return addr;
         }
         address acc = deploy(salt, bytecode);
+        // Plugins
         address[] memory plugins = new address[](1);
-        // singleOwnerPlugin = SingleOwnerPlugin(singleOwnerPluginAddress);
 
-        plugins[0] = singleOwnerPluginAddress;
+        plugins[0] = address(singleOwnerPlugin);
         bytes32[] memory pluginManifestHashes = new bytes32[](1);
         pluginManifestHashes[0] = singleOwnerPluginManifestHash;
         bytes[] memory pluginInstallData = new bytes[](1);

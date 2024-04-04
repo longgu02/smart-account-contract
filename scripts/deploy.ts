@@ -1,66 +1,47 @@
 import { ethers } from "hardhat";
 
-const SP_ADDRESS = "0x56fC17a65ccFEC6B7ad0aDe9BD9416CB365B9BE8";
 async function main() {
-	const af = await ethers.deployContract("AccountFactory", [SP_ADDRESS]);
+	const SingleOwnerPlugin = await ethers.deployContract("SingleOwnerPlugin");
+	await SingleOwnerPlugin.waitForDeployment();
+	console.log(`const SP_ADDRESS = "${SingleOwnerPlugin.target}"`);
 
+	const af = await ethers.deployContract("AccountFactory", [
+		SingleOwnerPlugin.target,
+	]);
 	await af.waitForDeployment();
+	console.log(`const AF_ADDRESS = "${af.target}"`);
 
-	console.log(`AF deployed to ${af.target}`);
+	const ep = await ethers.deployContract("EntryPoint");
+	await ep.waitForDeployment();
+	console.log(`const EP_ADDRESS = "${ep.target}"`);
 
-	// const ep = await ethers.deployContract("EntryPoint");
+	const pm = await ethers.deployContract("Paymaster");
+	await pm.waitForDeployment();
+	console.log(`const PM_ADDRESS = "${pm.target}"`);
 
-	// await ep.waitForDeployment();
+	const sm = await ethers.deployContract("SessionKeyManager");
+	await sm.waitForDeployment();
+	console.log(`const SM_ADDRESS = "${sm.target}"`);
 
-	// console.log(`EP deployed to ${ep.target}`);
+	const erc20sm = await ethers.deployContract("ERC20SessionValidationModule");
+	await erc20sm.waitForDeployment();
+	console.log(`const ERC20SM_ADDRESS = "${erc20sm.target}"`);
 
-	// const pm = await ethers.deployContract("Paymaster");
+	const nativeSm = await ethers.deployContract("NativeSessionValidationModule");
+	await nativeSm.waitForDeployment();
+	console.log(`const NATIVESM_ADDRESS = "${nativeSm.target}"`);
 
-	// await pm.waitForDeployment();
+	const ECDSAsm = await ethers.deployContract("EcdsaOwnershipRegistryModule");
+	await ECDSAsm.waitForDeployment();
+	console.log(`const ECDSASM_ADDRESS = "${ECDSAsm.target}"`);
 
-	// console.log(`PM deployed to ${pm.target}`);
-
-	// const sm = await ethers.deployContract("SessionKeyManager");
-
-	// await sm.waitForDeployment();
-
-	// console.log(`SM deployed to ${sm.target}`);
-
-	// const erc20sm = await ethers.deployContract("ERC20SessionValidationModule");
-
-	// await erc20sm.waitForDeployment();
-
-	// console.log(`erc20sm deployed to ${erc20sm.target}`);
-
-	// const nativeSm = await ethers.deployContract("NativeSessionValidationModule");
-
-	// await nativeSm.waitForDeployment();
-
-	// console.log(`nativeSm deployed to ${nativeSm.target}`);
-
-	// const ECDSAsm = await ethers.deployContract("EcdsaOwnershipRegistryModule");
-
-	// await ECDSAsm.waitForDeployment();
-
-	// console.log(`ECDSAsm deployed to ${ECDSAsm.target}`);
-
-	// const SingleOwnerPlugin = await ethers.deployContract("SingleOwnerPlugin");
-
-	// await SingleOwnerPlugin.waitForDeployment();
-
-	// console.log(`SingleOwnerPlugin deployed to ${SingleOwnerPlugin.target}`);
-
-	// const counterPlugin = await ethers.deployContract("CounterPlugin");
-
-	// await counterPlugin.waitForDeployment();
-
-	// console.log(`counterPlugin deployed to ${counterPlugin.target}`);
+	const counterPlugin = await ethers.deployContract("CounterPlugin");
+	await counterPlugin.waitForDeployment();
+	console.log(`const CTPLUGIN_ADDRESS = "${counterPlugin.target}"`);
 
 	const SubscriptionPlugin = await ethers.deployContract("SubscriptionPlugin");
-
 	await SubscriptionPlugin.waitForDeployment();
-
-	console.log(`SubscriptionPlugin deployed to ${SubscriptionPlugin.target}`);
+	console.log(`const SUBPLUGIN_ADDRESS = "${SubscriptionPlugin.target}"`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

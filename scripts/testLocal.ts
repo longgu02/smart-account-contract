@@ -2,17 +2,18 @@ import { ethers } from "hardhat";
 
 const MTK_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
 
-const acc = "0xfacff941e53707bc22e21d45aa8573bc4e477e34";
-const AF_ADDRESS = "0xFE5f411481565fbF70D8D33D992C78196E014b90";
-const EP_ADDRESS = "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f";
-const PM_ADDRESS = "0x4A679253410272dd5232B3Ff7cF5dbB88f295319";
-const SM_ADDRESS = "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F";
-const ERC20SM_ADDRESS = "0x09635F643e140090A9A8Dcd712eD6285858ceBef";
-const NATIVESM_ADDRESS = "0xc5a5C42992dECbae36851359345FE25997F5C42d";
-const ECDSASM_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933";
-const SP_ADDRESS = "0x56fC17a65ccFEC6B7ad0aDe9BD9416CB365B9BE8";
-const CTPLUGIN_ADDRESS = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
-const SUBPLUGIN_ADDRESS = "0x638A246F0Ec8883eF68280293FFE8Cfbabe61B44";
+const acc = "0xda7b1d6acbc52733a166e93396b3ea2fd4182e9c";
+
+export const SP_ADDRESS = "0x5bf5b11053e734690269C6B9D438F8C9d48F528A";
+export const AF_ADDRESS = "0xffa7CA1AEEEbBc30C874d32C7e22F052BbEa0429";
+export const EP_ADDRESS = "0x3aAde2dCD2Df6a8cAc689EE797591b2913658659";
+export const PM_ADDRESS = "0xab16A69A5a8c12C732e0DEFF4BE56A70bb64c926";
+export const SM_ADDRESS = "0xE3011A37A904aB90C8881a99BD1F6E21401f1522";
+export const ERC20SM_ADDRESS = "0x1f10F3Ba7ACB61b2F50B9d6DdCf91a6f787C0E82";
+export const NATIVESM_ADDRESS = "0x457cCf29090fe5A24c19c1bc95F492168C0EaFdb";
+export const ECDSASM_ADDRESS = "0x525C7063E7C20997BaaE9bDa922159152D0e8417";
+export const CTPLUGIN_ADDRESS = "0x38a024C0b412B9d1db8BC398140D00F5Af3093D4";
+export const SUBPLUGIN_ADDRESS = "0x5fc748f1FEb28d7b76fa1c6B07D8ba2d5535177c";
 
 async function main() {
 	const entryPoint = await ethers.getContractAt("EntryPoint", EP_ADDRESS);
@@ -58,7 +59,10 @@ async function main() {
 
 	console.log(`counter: ${await counterPlugin.count(acc)}`);
 	console.log(
-		`sub: ${await subscriptionPlugin.subscriptions(signer1.address, acc)}`
+		`sub: ${await subscriptionPlugin.subscriptions(
+			"0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+			acc
+		)}`
 	);
 	console.log(`account balance: ${await provider.getBalance(acc)}`);
 	console.log(

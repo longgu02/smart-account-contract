@@ -839,4 +839,11 @@ abstract contract PluginManagerInternals is IPluginManager {
         }
         return FunctionReferenceLib._EMPTY_FUNCTION_REFERENCE; // Empty checks are done elsewhere
     }
+
+    function _checkPluginInstalled(
+        address pluginAddress
+    ) internal view returns (bool) {
+        AccountStorage storage _storage = getAccountStorage();
+        return _storage.plugins.contains(pluginAddress);
+    }
 }
