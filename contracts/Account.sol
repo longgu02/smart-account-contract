@@ -277,22 +277,33 @@ contract Account is
     function validateUserOp(
         UserOperation calldata userOp,
         bytes32 userOpHash,
-        uint256
+        uint256 missingAccountFunds
     ) external returns (uint256 validationData) {
         // if (msg.sender != address(entryPoint()))
         //     revert CallerIsNotAnEntryPoint(msg.sender);
 
-        (, address validationModule) = abi.decode(
-            userOp.signature,
-            (bytes, address)
-        );
-        console.log(validationModule);
-        // if (address(_modules[validationModule]) != address(0)) {
-        validationData = IAuthorizationModule(validationModule).validateUserOp(
-            userOp,
-            userOpHash
-        );
+        // (, address validationModule) = abi.decode(
+        //     userOp.signature,
+        //     (bytes, address)
+        // );
+        // // if (address(_modules[validationModule]) != address(0)) {
+        // validationData = IAuthorizationModule(validationModule).validateUserOp(
+        //     userOp,
+        //     userOpHash
+        // );
+        // _payPrefund(missingAccountFunds);
+        return 0;
     }
+
+    // function _payPrefund(uint256 missingAccountFunds) internal virtual {
+    //     if (missingAccountFunds != 0) {
+    //         payable(msg.sender).call{
+    //             value: missingAccountFunds,
+    //             gas: type(uint256).max
+    //         }("");
+    //         //ignore failure (its EntryPoint's job to verify, not account.)
+    //     }
+    // }
 
     function _call(
         address target,
