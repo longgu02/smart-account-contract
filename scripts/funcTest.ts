@@ -2,36 +2,53 @@ import { ethers } from "hardhat";
 import { fillUserOp } from "../utils/userOp";
 import { Network } from "../utils/addresses";
 
-const acc = "0xbd374dcca2f7af3ce406bcabac72565815136e92";
-const SP_ADDRESS = "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650";
-const AF_ADDRESS = "0xc351628EB244ec633d5f21fBD6621e1a683B1181";
-const EP_ADDRESS = "0xFD471836031dc5108809D173A067e8486B9047A3";
-const PM_ADDRESS = "0xcbEAF3BDe82155F56486Fb5a1072cb8baAf547cc";
-const SM_ADDRESS = "0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f";
-const ERC20SM_ADDRESS = "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07";
-const NATIVESM_ADDRESS = "0x162A433068F51e18b7d13932F27e66a3f99E6890";
-const ECDSASM_ADDRESS = "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe";
-const CTPLUGIN_ADDRESS = "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f";
-const SUBPLUGIN_ADDRESS = "0x1fA02b2d6A771842690194Cf62D91bdd92BfE28d";
+const acc = "0xc02e40414992d80c7a2df88bd1e66d7894eb2cf0";
+export const SP_ADDRESS = "0x11c68f4FB6ef20cf27425B3271b58340673DB104";
+export const AF_ADDRESS = "0xfdfCFe90879cC0C09d74878d2fd2080d8D7114f7";
+export const EP_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
+export const PM_ADDRESS = "0xAc8a8857840670D50629F5175FfCf07dF3420277";
+export const SM_ADDRESS = "0x6a61AB7B90fc8154d5d5975767F02d2F0F1e6F4E";
+export const ERC20SM_ADDRESS = "0x2f8539D1f432ad791bE864C079F1857C5C04D5Ef";
+export const NATIVESM_ADDRESS = "0x0eaD091889CF2BF85c61Fda4ac59A68b195EfEd1";
+export const ECDSASM_ADDRESS = "0xC9E19aAde4C9b8157667143F69EBED2425683b09";
+export const CTPLUGIN_ADDRESS = "0x36e344b4bAD3828772A52703e5DaA88aA1266CF3";
+export const SUBPLUGIN_ADDRESS = "0x159B550f49873A09c2543eE311711E434e36ec50";
 
 async function main() {
-	const [signer0, signer1] = await ethers.getSigners();
+	const [signer0, signer1, signer2, signer3] = await ethers.getSigners();
 
+	// const provider = new ethers.JsonRpcProvider("http://localhost:8545");
+	// const YoutubeWallet = new ethers.Wallet(
+	// 	"0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a"
+	// ).connect(provider);
+	// const YoutubeSubPrice = ethers.parseEther("6");
 	// const subscriptionPlugin = await ethers.getContractAt(
 	// 	"SubscriptionPlugin",
 	// 	SUBPLUGIN_ADDRESS,
-	// 	signer1
+	// 	signer3
 	// );
 
-	// const tx = await subscriptionPlugin.collect(acc, ethers.parseEther("7"));
+	// const tx = await subscriptionPlugin.collect(acc, YoutubeSubPrice);
 	// const rec = await tx.wait();
 	// console.log(rec);
 
-	const account = await ethers.getContractAt("Account", acc);
+	const AccountFactory = await ethers.getContractAt(
+		"AccountFactory",
+		AF_ADDRESS
+	);
 
-	const tx = await account.checkPluginInstalled(SUBPLUGIN_ADDRESS);
+	const tx = await AccountFactory.createAccount(
+		"0x4293c950C41A8f5DD78195ee52e5011680725a9e",
+		ECDSASM_ADDRESS,
+		EP_ADDRESS
+	);
+
+	const re = await tx.wait();
+	console.log(re);
+
+	// const tx = await account.checkPluginInstalled(SUBPLUGIN_ADDRESS);
 	// const rece = await tx.wait();
-	console.log(tx);
+	// console.log(tx);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -5,20 +5,20 @@ import {
 } from "../utils/sessionKey";
 
 const FACTORY_NONCE = 1;
-const acc = "0x21e12ec5793b7644de1eb22b246dc0e4e3b08eba";
-export const AF_ADDRESS = "0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5";
-export const SP_ADDRESS = "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650";
-export const EP_ADDRESS = "0xFD471836031dc5108809D173A067e8486B9047A3";
-export const PM_ADDRESS = "0xcbEAF3BDe82155F56486Fb5a1072cb8baAf547cc";
-export const SM_ADDRESS = "0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f";
-export const ERC20SM_ADDRESS = "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07";
-export const NATIVESM_ADDRESS = "0x162A433068F51e18b7d13932F27e66a3f99E6890";
-export const ECDSASM_ADDRESS = "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe";
-export const CTPLUGIN_ADDRESS = "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f";
-export const SUBPLUGIN_ADDRESS = "0x1fA02b2d6A771842690194Cf62D91bdd92BfE28d";
+const acc = "0x74405bfafc55f3abb06606ef9a7631f8cbc34df0";
+const SP_ADDRESS = "0x851356ae760d987E095750cCeb3bC6014560891C";
+const AF_ADDRESS = "0xf5059a5D33d5853360D16C683c16e67980206f36";
+const EP_ADDRESS = "0x95401dc811bb5740090279Ba06cfA8fcF6113778";
+const PM_ADDRESS = "0x998abeb3E57409262aE5b751f60747921B33613E";
+const SM_ADDRESS = "0x70e0bA845a1A0F2DA3359C97E0285013525FFC49";
+const ERC20SM_ADDRESS = "0x4826533B4897376654Bb4d4AD88B7faFD0C98528";
+const NATIVESM_ADDRESS = "0x99bbA657f2BbC93c02D617f8bA121cB8Fc104Acf";
+const ECDSASM_ADDRESS = "0x0E801D84Fa97b50751Dbf25036d067dCf18858bF";
+const CTPLUGIN_ADDRESS = "0x8f86403A4DE0BB5791fa46B8e795C547942fE4Cf";
+const SUBPLUGIN_ADDRESS = "0x9d4454B023096f34B160D6B654540c56A1F81688";
 
 async function main() {
-	const [signer0, signer1, signer2] = await ethers.getSigners();
+	const [signer1, signer0, signer2] = await ethers.getSigners();
 	// CREATE: hash(deployer + nonce)
 	const AccountFactory = await ethers.getContractFactory("AccountFactory");
 	const ECDSAValidationContract = await ethers.getContractAt(
@@ -83,9 +83,13 @@ async function main() {
 	const SessionKeyManager = await ethers.getContractFactory(
 		"SessionKeyManager"
 	);
-	await entryPoint.depositTo(PM_ADDRESS, {
-		value: ethers.parseEther("10"),
-	});
+	// await entryPoint.depositTo(PM_ADDRESS, {
+	// 	value: ethers.parseEther("10"),
+	// });
+
+	// await entryPoint.depositTo(PM_ADDRESS, {
+	// 	value: ethers.parseEther("30"),
+	// });
 
 	const userOp = {
 		sender, // smart account address
@@ -101,14 +105,14 @@ async function main() {
 		// ]),
 		callData: Account.interface.encodeFunctionData("execute", [
 			"0xF6f94b71bbdc4716dc138A04593a7fb0504F3e43",
-			ethers.parseEther("4"),
+			ethers.parseEther("0"),
 			"0x",
 		]),
-		callGasLimit: 900_000 * 10,
-		verificationGasLimit: 900_000 * 10,
-		preVerificationGas: 400_000 * 10,
-		maxFeePerGas: ethers.parseUnits("1000", "gwei"),
-		maxPriorityFeePerGas: ethers.parseUnits("500", "gwei"),
+		callGasLimit: 900_000 * 6,
+		verificationGasLimit: 900_000 * 6,
+		preVerificationGas: 900_000 * 6,
+		maxFeePerGas: ethers.parseUnits("100", "gwei"),
+		maxPriorityFeePerGas: ethers.parseUnits("50", "gwei"),
 		paymasterAndData: PM_ADDRESS, // PM_ADDRESS
 		signature: "0x",
 	};
