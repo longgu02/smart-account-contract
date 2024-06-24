@@ -7,11 +7,11 @@ import {ManifestFunction, ManifestAssociatedFunctionType, ManifestAssociatedFunc
 
 /// @title Counter Plugin
 /// @author Pham Tuan Long
-/// @notice This plugin provide subscription mechanism for accounts!
+/// @notice This plugin lets increment a count!
 
-contract SubscriptionPlugin is BasePlugin {
+contract FastTransferPlugin is BasePlugin {
     // metadata used by the pluginMetadata() method down below
-    string public constant NAME = "Subscribe Plugin";
+    string public constant NAME = "Fast Transfer Plugin";
     string public constant VERSION = "1.0.0";
     string public constant AUTHOR = "Long Pham";
 
@@ -34,14 +34,14 @@ contract SubscriptionPlugin is BasePlugin {
      * that a mapping from the account address is considered associated storage.
      */
 
-    struct SubscriptionData {
-        uint amount;
-        uint lastPaid;
-        bool enabled;
-    }
+    // struct SubscriptionData {
+    //     uint amount;
+    //     uint lastPaid;
+    //     bool enabled;
+    // }
 
-    mapping(address => mapping(address => SubscriptionData))
-        public subscriptions;
+    mapping(address => bytes32) public sessions;
+    uint interval = 2 minutes; // 2 minutes in seconds
 
     // ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     // ┃    Execution functions    ┃
@@ -51,25 +51,38 @@ contract SubscriptionPlugin is BasePlugin {
     // we define increment to modify our associated storage, count
     // then in the manifest we define it as an execution function,
     // and we specify the validation function for the user op targeting this function
-    function subscribe(address beneficiary, uint amount) external {
-        subscriptions[beneficiary][msg.sender] = SubscriptionData(
-            amount,
-            0,
-            true
+    function createSession(
+        uint startDate,
+        uint nonce,
+        address publicKey
+    ) public {
+        sessions[msg.sender] = keccak256(
+            abi.encodePacked(startDate, nonce, publicKey)
         );
     }
 
-    function collect(address subscriber, uint amount) external {
-        SubscriptionData storage subscription = subscriptions[msg.sender][
-            subscriber
-        ];
-        require(subscription.amount == amount);
-        require(block.timestamp - subscription.lastPaid >= 4 weeks);
-        require(subscription.enabled);
+    function transfer(
+        address sender,
+        address receiver,
+        uint amount,
+        uint startDate,
+        uint nonce,
+        address publicKey
+    ) external {
+        require(
+            block.timestamp - startDate <= interval,
+            "Fast transfer error: Session expired"
+        );
 
-        subscription.lastPaid = block.timestamp;
-        IPluginExecutor(subscriber).executeFromPluginExternal(
-            msg.sender,
+        bytes32 hashed = keccak256(
+            abi.encodePacked(startDate, nonce, publicKey)
+        );
+        require(
+            sessions[sender] != bytes32(0) && hashed == sessions[sender],
+            "Fast transfer error: Unauthorized"
+        );
+        IPluginExecutor(sender).executeFromPluginExternal(
+            receiver,
             amount,
             "0x"
         );
@@ -103,7 +116,7 @@ contract SubscriptionPlugin is BasePlugin {
         // we only have one execution function that can be called, which is the increment function
         // here we define that increment function on the manifest as something that can be called during execution
         manifest.executionFunctions = new bytes4[](1);
-        manifest.executionFunctions[0] = this.subscribe.selector;
+        manifest.executionFunctions[0] = this.createSession.selector;
 
         // you can think of ManifestFunction as a reference to a function somewhere,
         // we want to say "use this function" for some purpose - in this case,
@@ -122,7 +135,7 @@ contract SubscriptionPlugin is BasePlugin {
             1
         );
         manifest.userOpValidationFunctions[0] = ManifestAssociatedFunction({
-            executionSelector: this.subscribe.selector,
+            executionSelector: this.createSession.selector,
             associatedFunction: ownerUserOpValidationFunction
         });
 
@@ -133,7 +146,7 @@ contract SubscriptionPlugin is BasePlugin {
             1
         );
         manifest.preRuntimeValidationHooks[0] = ManifestAssociatedFunction({
-            executionSelector: this.subscribe.selector,
+            executionSelector: this.createSession.selector,
             associatedFunction: ManifestFunction({
                 functionType: ManifestAssociatedFunctionType
                     .PRE_HOOK_ALWAYS_DENY,

@@ -193,9 +193,9 @@ async function main() {
 		await entryPoint.getSenderAddress(initCode);
 	} catch (ex: any) {
 		// Local
-		sender = "0x" + ex.data.data.slice(-40);
+		// sender = "0x" + ex.data.data.slice(-40);
 		// Testnet
-		// sender = "0x" + ex.data.slice(-40)
+		sender = "0x" + ex.data.slice(-40);
 	}
 
 	console.log({ sender });
@@ -210,9 +210,9 @@ async function main() {
 	const SessionKeyManager = await ethers.getContractFactory(
 		"SessionKeyManager"
 	);
-	await entryPoint.depositTo(PM_ADDRESS, {
-		value: ethers.parseEther("10"),
-	});
+	// await entryPoint.depositTo(PM_ADDRESS, {
+	// 	value: ethers.parseEther("10"),
+	// });
 
 	const CounterPlugin = await ethers.getContractFactory("CounterPlugin");
 	const SubscriptionPlugin = await ethers.getContractFactory(
@@ -283,15 +283,16 @@ async function main() {
 	userOp.signature = signatureWithModuleAddress;
 	// userOp.signature = await signer0.signMessage(ethers.getBytes(userOpHash));
 	console.log({ signature });
-	const tx = await entryPoint.handleOps([userOp], address0);
-	const receipt = await tx.wait();
-	console.log(receipt);
+	// const tx = await entryPoint.handleOps([userOp], address0);
+	// const receipt = await tx.wait();
+	// console.log(receipt);
 
 	const accountContract = await ethers.getContractAt(
 		"Account",
 		sender,
-		signer1
+		signer0
 	);
+	console.log(sender);
 	const tx2 = await accountContract.installPlugin(
 		SUBPLUGIN_ADDRESS,
 		manifestHash,

@@ -1,11 +1,12 @@
 import { ethers } from "hardhat";
+import { pack } from "../utils/helpers";
 
 // const PM_ADDRESS = "0xAc8a8857840670D50629F5175FfCf07dF3420277";
 const MTK_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
 
-const acc = "0xc02e40414992d80c7a2df88bd1e66d7894eb2cf0";
-export const SP_ADDRESS = "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e";
-export const AF_ADDRESS = "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0";
+const acc = "0xa034c2cb18025115d4aba6e5ccacc61da7ada3a3";
+export const SP_ADDRESS = "0xedb8873491d44252876ad13D9bC362205B55F536";
+export const AF_ADDRESS = "0xfdfCFe90879cC0C09d74878d2fd2080d8D7114f7";
 
 // const EP_ADDRESS = "0x95401dc811bb5740090279Ba06cfA8fcF6113778";
 // const PM_ADDRESS = "0x998abeb3E57409262aE5b751f60747921B33613E";
@@ -13,12 +14,12 @@ export const AF_ADDRESS = "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0";
 export const EP_ADDRESS = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
 export const PM_ADDRESS = "0xAc8a8857840670D50629F5175FfCf07dF3420277";
 
-export const SM_ADDRESS = "0x0B306BF915C4d645ff596e518fAf3F9669b97016";
-export const ERC20SM_ADDRESS = "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1";
-export const NATIVESM_ADDRESS = "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE";
-export const ECDSASM_ADDRESS = "0x68B1D87F95878fE05B998F19b66F4baba5De1aed";
-export const CTPLUGIN_ADDRESS = "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c";
-export const SUBPLUGIN_ADDRESS = "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d";
+export const SM_ADDRESS = "0x6a61AB7B90fc8154d5d5975767F02d2F0F1e6F4E";
+export const ERC20SM_ADDRESS = "0x2f8539D1f432ad791bE864C079F1857C5C04D5Ef";
+export const NATIVESM_ADDRESS = "0x0eaD091889CF2BF85c61Fda4ac59A68b195EfEd1";
+export const ECDSASM_ADDRESS = "0xC9E19aAde4C9b8157667143F69EBED2425683b09";
+export const CTPLUGIN_ADDRESS = "0x36e344b4bAD3828772A52703e5DaA88aA1266CF3";
+export const SUBPLUGIN_ADDRESS = "0x159B550f49873A09c2543eE311711E434e36ec50";
 
 async function main() {
 	const entryPoint = await ethers.getContractAt("EntryPoint", EP_ADDRESS);
@@ -43,6 +44,7 @@ async function main() {
 	const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 	const [signer0, signer1, signer2] = await ethers.getSigners();
 	const account = await ethers.getContractAt("Account", acc);
+	const afContract = await ethers.getContractAt("AccountFactory", AF_ADDRESS);
 
 	// const count = await account.count();
 	// const accountBalance = await entryPoint.balanceOf(acc);
@@ -100,6 +102,17 @@ async function main() {
 	// 		acc
 	// 	)}`
 	// );
+	// const dependencies = [pack(SP_ADDRESS, 1)];
+	// console.log(
+	// 	await account.installPlugin(
+	// 		"0x159B550f49873A09c2543eE311711E434e36ec50",
+	// 		"0x848770b485b2b000ba84ff7cde8b8de3fc41043dfa77193d9dbb509c004178c0",
+	// 		"0x",
+	// 		dependencies
+	// 	)
+	// );
+	// console.log(await afContract.singleOwnerPlugin());
+	// console.log(await account.checkPluginInstalled(SUBPLUGIN_ADDRESS));
 	// console.log(`account balance: ${await provider.getBalance(acc)}`);
 	// console.log(
 	// 	`Merkle root: ${(await sessionKeyManager.getSessionKeys(acc)).merkleRoot}`

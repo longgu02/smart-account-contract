@@ -21,6 +21,8 @@ export const genMerkleTree = (
 		sessionData,
 	]);
 
+
+
 	const merkleTree = new MerkleTree(
 		[ethers.keccak256(data), ethers.keccak256(data)],
 		keccak256,

@@ -1,3 +1,5 @@
+import { ethers } from "hardhat";
+
 interface UserOp {
 	sender?: string; // smart account address
 	nonce: string;
@@ -10,4 +12,14 @@ interface UserOp {
 	maxPriorityFeePerGas?: string;
 	paymasterAndData: string;
 	signature: string;
+}
+
+interface PoolInfo {
+	token0: string;
+	token1: string;
+	fee: number;
+	tickSpacing: number;
+	sqrtPriceX96: BigInt;
+	liquidity: BigInt;
+	tick: number;
 }

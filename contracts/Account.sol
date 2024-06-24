@@ -292,7 +292,7 @@ contract Account is
             userOpHash
         );
         _payPrefund(missingAccountFunds);
-        return 0;
+        // return 0;
     }
 
     function _payPrefund(uint256 missingAccountFunds) internal virtual {
