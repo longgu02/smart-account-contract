@@ -2,10 +2,31 @@
 pragma solidity ^0.8.24;
 
 import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {IEntryPoint} from "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
-contract Paymaster is IPaymaster {
+contract Paymaster is IPaymaster, ReentrancyGuard {
+    mapping(address => uint) paymasterIdBalances;
+    IEntryPoint public immutable ENTRY_POINT;
+
+    event GasDeposited(address indexed _paymasterId, uint256 indexed _value);
+    event GasWithdrawn(
+        address indexed _paymasterId,
+        address indexed _to,
+        uint256 indexed _value
+    );
+
+    error PaymasterIdCannotBeZero();
+    error DepositCanNotBeZero();
+    error CanNotWithdrawToZeroAddress();
+    error InsufficientBalance(uint, uint);
+
+    constructor(address entryPoint) {
+        ENTRY_POINT = IEntryPoint(entryPoint);
+    }
+
     function validatePaymasterUserOp(
-        UserOperation calldata,
+        UserOperation calldata op,
         bytes32,
         uint256
     ) external pure returns (bytes memory context, uint256 validationData) {
@@ -30,7 +51,7 @@ contract Paymaster is IPaymaster {
     function withdrawTo(
         address payable withdrawAddress,
         uint256 amount
-    ) public override nonReentrant {
+    ) public nonReentrant {
         if (withdrawAddress == address(0)) revert CanNotWithdrawToZeroAddress();
         uint256 currentBalance = paymasterIdBalances[msg.sender];
         if (amount > currentBalance)

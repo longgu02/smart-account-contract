@@ -3,16 +3,6 @@ pragma solidity ^0.8.24;
 import "./ISessionValidationModule.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-/**
- * @title ERC20 Session Validation Module for Biconomy Smart Accounts.
- * @dev Validates userOps for ERC20 transfers and approvals using a session key signature.
- *         - Recommended to use with standard ERC20 tokens only
- *         - Can be used with any method of any contract which implement
- *           method(address, uint256) interface
- *
- * @author Fil Makarov - <filipp.makarov@biconomy.io>
- */
-
 contract NativeSessionValidationModule is ISessionValidationModule {
     /**
      * @dev validates that the call (destinationContract, callValue, funcCallData)
